@@ -31,7 +31,7 @@ export class TreeState extends State<Subtree> {
         if (isLeaf) {
           leafFunc(path)
         } else {
-          dfs(subtree[key])
+          dfs(children)
         }
         afterFunc(path)
         path.pop()
