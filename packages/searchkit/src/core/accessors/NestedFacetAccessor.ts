@@ -152,9 +152,6 @@ export class NestedFacetAccessor extends FilterBasedAccessor<LevelState> {
         )
       )
     )
-    if (query.query.aggs) {
-      console.log(query.query.aggs[this.options.id].aggs.children);
-    }
     return query
   }
 }

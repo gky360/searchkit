@@ -5,8 +5,15 @@ import {
   SearchkitComponent,
   TreeFacetAccessor,
   FastClick,
-  SearchkitComponentProps
+  SearchkitComponentProps,
+  RenderComponentType,
+  renderComponent,
+  RenderComponentPropType
 } from "../../../../../core"
+
+import {
+  Panel, ItemComponent, ItemProps
+} from "../../../../ui"
 
 const defaults = require("lodash/defaults")
 const map = require("lodash/map")
@@ -20,14 +27,18 @@ export interface HierarchicalRefinementMultiFilterProps extends SearchkitCompone
   orderKey?:string
   orderDirection?:string
   startLevel?:number
-  countFormatter?:(count:number)=> number | string
+  countFormatter?:(count:number)=> number | string,
+  containerComponent?: RenderComponentType<any>,
+  itemComponent?: RenderComponentType<ItemProps>
 }
 
 export class HierarchicalRefinementMultiFilter extends SearchkitComponent<HierarchicalRefinementMultiFilterProps, any> {
   public accessor:TreeFacetAccessor
 
   static defaultProps = {
-    countFormatter:identity
+    countFormatter:identity,
+    containerComponent: Panel,
+    itemComponent: ItemComponent
   }
 
   static propTypes = defaults({
@@ -39,6 +50,14 @@ export class HierarchicalRefinementMultiFilter extends SearchkitComponent<Hierar
     startLevel:PropTypes.number,
     countFormatter:PropTypes.func
   }, SearchkitComponent.propTypes)
+
+  defineBEMBlocks() {
+    var blockClass = this.props.mod || "sk-hierarchical-refinement";
+    return {
+      container: `${blockClass}-list`,
+      option: `${blockClass}-option`
+    }
+  }
 
   defineAccessor() {
     const {
@@ -61,9 +80,56 @@ export class HierarchicalRefinementMultiFilter extends SearchkitComponent<Hierar
     });
   }
 
-  render() {
+  renderOption(parentPath, option) {
+    const block = this.bemBlocks.container
+    const { key, doc_count } = option
+    const path = [...parentPath, key]
+    const active = this.accessor.resultsState.hasPath(path)
+    const { countFormatter, itemComponent } = this.props
+
     return (
-      <div>HierarchicalRefinementMultiFilter</div>
+      <div key={key}>
+        {
+          renderComponent(itemComponent, {
+            active,
+            bemBlocks:this.bemBlocks,
+            label:this.translate(key),
+            itemKey:option.key,
+            count:countFormatter(doc_count),
+            showCount:true,
+          })
+        }
+        {active && this.renderOptions(path)}
+      </div>
+    )
+    // onClick: this.addFilter.bind(this, level, option)
+  }
+
+  renderOptions(path = []) {
+    const block = this.bemBlocks.container
+    const { resultsState } = this.accessor
+    const buckets = this.accessor.getBuckets(path)
+    return(
+      <div className={block("hierarchical-options")}>
+        {
+          map(buckets, this.renderOption.bind(this, path))
+        }
+      </div>
+    )
+  }
+
+  render() {
+    const block = this.bemBlocks.container
+    const { id, title, containerComponent } = this.props
+    return renderComponent(
+      containerComponent, {
+        title,
+        className: id ? `filter--${id}` : undefined,
+        disabled: this.accessor.getBuckets().length == 0
+      },
+      <div className={block("root")}>
+        {this.renderOptions()}
+      </div>
     )
   }
 

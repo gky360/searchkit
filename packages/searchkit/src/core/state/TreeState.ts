@@ -3,6 +3,7 @@ const map = require("lodash/map")
 const noop = require("lodash/noop")
 const isEmpty = require("lodash/isEmpty")
 const forOwn = require("lodash/forOwn")
+const hasIn = require("lodash/hasIn")
 
 
 export type Subtree = { string: Subtree } | {} | ""
@@ -16,6 +17,10 @@ export class TreeState extends State<Subtree> {
 
   isEmpty() {
     return isEmpty(this.value)
+  }
+
+  hasPath(path) {
+    return hasIn(this.getValue(), path)
   }
 
   walk(config:any = {}) {

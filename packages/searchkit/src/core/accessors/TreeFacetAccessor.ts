@@ -19,6 +19,8 @@ const each = require("lodash/each")
 const take = require("lodash/take")
 
 const aggKeyPrefix = "path-"
+const toAggKey = (path) => (aggKeyPrefix + path.join('.'))
+
 
 export interface TreeFacetAccessorOptions {
   field:string
@@ -47,6 +49,17 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
   //   }
   //   this.state = this.state.setValue(value)
   // }
+
+  getBuckets(path = []) {
+    let buckets:Array<any> = this.getAggregations(
+      [this.key, "children", toAggKey(path), "children", "buckets"],
+      []
+    )
+    return map(buckets, (item)=> {
+      item.key = String(item.key)
+      return item
+    })
+  }
 
   buildSharedQuery(query) {
     console.log('TreeFacetAccessor buildSharedQuery()')
@@ -112,15 +125,13 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
     const termAggs = this.getTermAggs()
     const treeNodeAgss = []
 
-    const pathToAggKey = (path) => (aggKeyPrefix + path.join('.'))
-
     this.state.walk({
       beforeFunc: (path) => {
         const level = path.length
-        const ancestorsQuery = map(path, (name) => (TermQuery(ancestorsField, name)))
+        const ancestorsQuery = map(path, (key) => (TermQuery(ancestorsField, key)))
         treeNodeAgss.push(
           FilterBucket(
-            pathToAggKey(path),
+            toAggKey(path),
             BoolMust([TermQuery(levelField, level + startLevel), ...ancestorsQuery]),
             termAggs
           )
@@ -139,9 +150,6 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
         )
       )
     )
-    if (query.query.aggs) {
-      console.log(query.query.aggs[this.options.id].aggs.children);
-    }
     return query
   }
 
