@@ -141,7 +141,7 @@ export class NestedFacetAccessor extends FilterBasedAccessor<LevelState> {
       addLevel(i+1, ancestors)
     })
 
-    return query.setAggs(
+    query = query.setAggs(
       FilterBucket(
         this.key,
         query.getFiltersWithoutKeys(this.uuid),
@@ -152,5 +152,9 @@ export class NestedFacetAccessor extends FilterBasedAccessor<LevelState> {
         )
       )
     )
+    if (query.query.aggs) {
+      console.log(query.query.aggs[this.options.id].aggs.children);
+    }
+    return query
   }
 }

@@ -72,8 +72,8 @@ export class App extends React.Component<any, any> {
       <div className="sk-layout__body">
 
   			<div className="sk-layout__filters">
-          <HierarchicalRefinementMultiFilter field="taxonomy" id="categories" title="Region" startLevel={2}/>
-          <HierarchicalRefinementFilter field="taxonomy" id="categories__" title="Region" startLevel={2}/>
+          <HierarchicalRefinementMultiFilter field="taxonomy" id="categories" title="Region"/>
+          <HierarchicalRefinementFilter field="taxonomy" id="categories__" title="Region"/>
           <RefinementListFilter
             field="taxonomy.value"
             fieldOptions={{type:'nested', options:{path:"taxonomy"}}}

@@ -24,18 +24,18 @@ export class TreeState extends State<Subtree> {
     const afterFunc = (typeof config.afterFunc === "function") ? config.afterFunc : noop
     const leafFunc = (typeof config.leafFunc === "function") ? config.leafFunc : noop
     const dfs = (subtree:Subtree) => {
-      forOwn(subtree, (children, key) => {
-        const isLeaf = isEmpty(children)
-        path.push(key)
-        beforeFunc(path)
-        if (isLeaf) {
-          leafFunc(path)
-        } else {
+      beforeFunc(path)
+      const isLeaf = isEmpty(subtree)
+      if (isLeaf) {
+        leafFunc(path)
+      } else {
+        forOwn(subtree, (children, key) => {
+          path.push(key)
           dfs(children)
-        }
-        afterFunc(path)
-        path.pop()
-      })
+          path.pop()
+        })
+      }
+      afterFunc(path)
     }
 
     dfs(this.value)
