@@ -5,6 +5,7 @@ import {
   SearchBox,
   Hits,
   HierarchicalRefinementFilter,
+  HierarchicalRefinementMultiFilter,
   RefinementListFilter,
   NumericRefinementListFilter,
   DynamicRangeFilter,
@@ -25,9 +26,13 @@ require("searchkit/release/theme.css")
 
 const TaxonomyHitsItem = (props)=> {
   const {result, bemBlocks} = props
+  const paths = (result._source.taxonomy.slice().sort((a, b) => (a.path.localeCompare(b.path))).map(t => t.path))
   return (
     <div className={bemBlocks.item().mix(bemBlocks.container("item"))}>
       {result._source.name}
+      <div>
+        {paths.map((path) => (<span key={path}>{path}<br /></span>))}
+      </div>
     </div>
   )
 }
@@ -40,6 +45,11 @@ export class App extends React.Component<any, any> {
     super()
     const host = "http://demo.searchkit.co/api/taxonomy"
     this.searchkit = new SearchkitManager(host)
+    this.searchkit.setQueryProcessor((q) => {
+      console.log(q)
+      // console.log(JSON.stringify(q, null, 2))
+      return q;
+    })
   }
 
   render(){ return (
@@ -62,7 +72,8 @@ export class App extends React.Component<any, any> {
       <div className="sk-layout__body">
 
   			<div className="sk-layout__filters">
-          <HierarchicalRefinementFilter field="taxonomy" id="categories" title="Region" startLevel={2}/>
+          <HierarchicalRefinementMultiFilter field="taxonomy" id="categories" title="Region" startLevel={2}/>
+          <HierarchicalRefinementFilter field="taxonomy" id="categories__" title="Region" startLevel={2}/>
           <RefinementListFilter
             field="taxonomy.value"
             fieldOptions={{type:'nested', options:{path:"taxonomy"}}}
