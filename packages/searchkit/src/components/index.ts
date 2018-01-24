@@ -13,6 +13,7 @@ export * from "./search/search-box/SearchBox";
 export * from "./search/sorting-selector/src/SortingSelector";
 export * from "./search/page-size-selector/PageSizeSelector";
 export * from "./search/filters/hierarchical-refinement-filter/src/HierarchicalRefinementFilter";
+export * from "./search/filters/hierarchical-refinement-multi-filter/src/HierarchicalRefinementMultiFilter";
 export * from "./search/filters/range-filter/src/RangeFilter";
 export * from "./search/filters/facet-filter";
 export * from "./search/filters/tag-filter";
