@@ -80,16 +80,18 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
         })
         pathQueries.push(BoolMust(filterTerms))
 
-        const leaf = path[path.length - 1] || ""
-        const parentOfLeaf = path[path.length - 2] || this.options.title || this.key
-        console.log(path);
-        const selectedFilter = {
-          id: this.key,
-          name: this.translate(parentOfLeaf),
-          value: leaf,
-          remove: this.removeSelectedFilter.bind(this, [...path])
+        if (path.length > 0) {
+          const leaf = path[path.length - 1] || ""
+          const parentOfLeaf = path[path.length - 2] || this.options.title || this.key
+          console.log(path);
+          const selectedFilter = {
+            id: this.key,
+            name: this.translate(parentOfLeaf),
+            value: leaf,
+            remove: this.removeSelectedFilter.bind(this, [...path])
+          }
+          selectedFilters.push(selectedFilter)
         }
-        selectedFilters.push(selectedFilter)
       }
     })
 
@@ -98,8 +100,9 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
       query = query.addFilter(
         this.uuid,
         NestedQuery(this.options.field, treeQuery)
-      ).addSelectedFilters(selectedFilters)
+      )
     }
+    query = query.addSelectedFilters(selectedFilters)
 
     return query
   }

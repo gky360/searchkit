@@ -15,11 +15,19 @@ export type Subtree = { string: Subtree } | {} | ""
 export class TreeState extends State<Subtree> {
   value: Subtree // root of the tree
 
+  constructor(value = null) {
+    super(value)
+    this.value = this.value || {}
+  }
+
   getValue() {
     return this.value || {}
   }
 
   getSubtree(path = []) {
+    if (path.length === 0) {
+      return this.getValue()
+    }
     return get(this.getValue(), path)
   }
 
@@ -28,6 +36,9 @@ export class TreeState extends State<Subtree> {
   }
 
   hasPath(path) {
+    if (path.length === 0) {
+      return true
+    }
     return hasIn(this.getValue(), path)
   }
 
@@ -55,7 +66,11 @@ export class TreeState extends State<Subtree> {
 
   clearSubtree(path) {
     if (this.hasPath(path)) {
-      set(this.value, path, "")
+      if (path.length === 0) {
+        this.value = {}
+      } else {
+        set(this.value, path, "")
+      }
     }
     return this
   }
