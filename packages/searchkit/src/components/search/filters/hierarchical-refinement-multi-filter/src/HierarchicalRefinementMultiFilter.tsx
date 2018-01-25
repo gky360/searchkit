@@ -80,6 +80,11 @@ export class HierarchicalRefinementMultiFilter extends SearchkitComponent<Hierar
     });
   }
 
+  addFilter(path) {
+    this.accessor.state = this.accessor.state.toggleNode(path)
+    this.searchkit.performSearch()
+  }
+
   renderOption(parentPath, option) {
     const block = this.bemBlocks.container
     const { key, doc_count } = option
@@ -97,12 +102,12 @@ export class HierarchicalRefinementMultiFilter extends SearchkitComponent<Hierar
             itemKey:option.key,
             count:countFormatter(doc_count),
             showCount:true,
+            onClick: this.addFilter.bind(this, path)
           })
         }
         {active && this.renderOptions(path)}
       </div>
     )
-    // onClick: this.addFilter.bind(this, level, option)
   }
 
   renderOptions(path = []) {

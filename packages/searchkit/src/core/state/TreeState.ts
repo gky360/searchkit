@@ -1,6 +1,8 @@
 import { State } from "./State"
 const map = require("lodash/map")
 const noop = require("lodash/noop")
+const get = require("lodash/get")
+const set = require("lodash/set")
 const isEmpty = require("lodash/isEmpty")
 const forOwn = require("lodash/forOwn")
 const hasIn = require("lodash/hasIn")
@@ -15,12 +17,35 @@ export class TreeState extends State<Subtree> {
     return this.value || {}
   }
 
+  getSubtree(path = []) {
+    return get(this.getValue(), path)
+  }
+
   isEmpty() {
     return isEmpty(this.value)
   }
 
   hasPath(path) {
     return hasIn(this.getValue(), path)
+  }
+
+  isLeaf(path) {
+    return this.hasPath(path) && isEmpty(this.getSubtree(path))
+  }
+
+  addPath(path) {
+    set(this.value, path, "")
+    return this
+  }
+
+  popLeaf(path) {
+    set(this.value, path.slice(0, -1), "")
+    return this
+  }
+
+  clearSubtree(path) {
+    set(this.value, path, "")
+    return this
   }
 
   walk(config:any = {}) {
@@ -45,6 +70,20 @@ export class TreeState extends State<Subtree> {
 
     dfs(this.value)
   }
+
+  toggleNode(path):TreeState {
+    if (this.hasPath(path)) {
+      if (this.isLeaf(path)) {
+        this.popLeaf(path)
+      } else {
+        this.clearSubtree(path)
+      }
+    } else {
+      this.addPath(path)
+    }
+    return this
+  }
+
 }
 
 // const t = new TreeState(
