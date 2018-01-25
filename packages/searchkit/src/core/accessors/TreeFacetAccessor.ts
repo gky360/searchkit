@@ -65,9 +65,9 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
     console.log('TreeFacetAccessor buildSharedQuery()')
 
     const pathQueries = []
+    const selectedFilters = []
     this.state.walk({
       leafFunc: (path) => {
-        console.log(path);
         const lastIndex = path.length - 1
         const filterTerms = map(path, (value, i) => {
           const isLeaf = (i === lastIndex)
@@ -75,6 +75,16 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
           return TermQuery(this.options.field + subField, value)
         })
         pathQueries.push(BoolMust(filterTerms))
+
+        const leaf = path[path.length - 1] || ""
+        const parentOfLeaf = path[path.length - 2] || this.options.title || this.key
+        const selectedFilter = {
+          id: this.key,
+          name: this.translate(parentOfLeaf),
+          value: leaf,
+          remove: () => {}
+        }
+        selectedFilters.push(selectedFilter)
       }
     })
 
@@ -83,7 +93,7 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
       query = query.addFilter(
         this.uuid,
         NestedQuery(this.options.field, treeQuery)
-      )
+      ).addSelectedFilters(selectedFilters)
     }
 
     return query
