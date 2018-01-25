@@ -3,6 +3,8 @@ const map = require("lodash/map")
 const noop = require("lodash/noop")
 const get = require("lodash/get")
 const set = require("lodash/set")
+const unset = require("lodash/unset")
+const size = require("lodash/size")
 const isEmpty = require("lodash/isEmpty")
 const forOwn = require("lodash/forOwn")
 const hasIn = require("lodash/hasIn")
@@ -34,18 +36,41 @@ export class TreeState extends State<Subtree> {
   }
 
   addPath(path) {
-    set(this.value, path, "")
+    if (!this.hasPath(path)) {
+      set(this.value, path, "")
+    }
     return this
   }
 
   popLeaf(path) {
-    set(this.value, path.slice(0, -1), "")
+    if (this.isLeaf(path)) {
+      this.clearSubtree(path.slice(0, -1))
+    }
     return this
   }
 
+  clear() {
+    return this.clearSubtree([])
+  }
+
   clearSubtree(path) {
-    set(this.value, path, "")
+    if (this.hasPath(path)) {
+      set(this.value, path, "")
+    }
     return this
+  }
+
+  clearPath(path) {
+    if (!this.hasPath(path)) {
+      return this
+    }
+    for (let i = path.length - 1; i >= 0; i--) {
+      if (size(this.getSubtree(path.slice(0, i))) > 1) {
+        unset(this.value, path.slice(0, i + 1))
+        return this
+      }
+    }
+    return this.clear()
   }
 
   walk(config:any = {}) {

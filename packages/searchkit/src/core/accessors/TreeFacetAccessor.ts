@@ -61,6 +61,10 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
     })
   }
 
+  removeSelectedFilter(path) {
+    this.state = this.state.clearPath(path)
+  }
+
   buildSharedQuery(query) {
     console.log('TreeFacetAccessor buildSharedQuery()')
 
@@ -78,11 +82,12 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
 
         const leaf = path[path.length - 1] || ""
         const parentOfLeaf = path[path.length - 2] || this.options.title || this.key
+        console.log(path);
         const selectedFilter = {
           id: this.key,
           name: this.translate(parentOfLeaf),
           value: leaf,
-          remove: () => {}
+          remove: this.removeSelectedFilter.bind(this, [...path])
         }
         selectedFilters.push(selectedFilter)
       }
