@@ -55,7 +55,7 @@ export class TreeState extends State<Subtree> {
 
   popLeaf(path) {
     if (this.isLeaf(path)) {
-      this.clearSubtree(path.slice(0, -1))
+      unset(this.value, path)
     }
     return this
   }
