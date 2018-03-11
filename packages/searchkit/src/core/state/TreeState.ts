@@ -9,7 +9,6 @@ const isEmpty = require("lodash/isEmpty")
 const forOwn = require("lodash/forOwn")
 const hasIn = require("lodash/hasIn")
 
-
 export type Subtree = { string: Subtree } | {} | ""
 
 export class TreeState extends State<Subtree> {

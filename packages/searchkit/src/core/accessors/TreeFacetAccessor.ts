@@ -143,6 +143,8 @@ export class TreeFacetAccessor extends FilterBasedAccessor<TreeState> {
     const termAggs = this.getTermAggs()
     const treeNodeAgss = []
 
+    console.log('TreeFacetAccessor buildOwnQuery');
+
     this.state.walk({
       beforeFunc: (path) => {
         const level = path.length
